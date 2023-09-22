@@ -41,7 +41,7 @@ RUN curl -f https://archive.apache.org/dist/hbase/2.4.9/hbase-2.4.9-bin.tar.gz |
     curl https://repo1.maven.org/maven2/com/google/cloud/bigtable/bigtable-hbase-2.x-hadoop/1.26.2/bigtable-hbase-2.x-hadoop-1.26.2.jar \
     -f -o hbase-2.4.9/lib/bigtable/bigtable-hbase-2.x.jar && \
     curl https://repo1.maven.org/maven2/io/netty/netty-tcnative-boringssl-static/2.0.46.Final/netty-tcnative-boringssl-static-2.0.46.Final.jar \
-      -f -o hbase-2.4.9/lib/netty-tcnative-boringssl-static-2.0.46.Final.jar && \
+    -f -o hbase-2.4.9/lib/netty-tcnative-boringssl-static-2.0.46.Final.jar && \
     echo 'export HBASE_CLASSPATH="$HBASE_HOME/lib/bigtable/bigtable-hbase-2.x.jar:$HBASE_HOME/lib/netty-tcnative-boringssl-static-2.0.46.Final.jar"' >> /hbase-2.4.9/conf/hbase-env.sh && \
     echo 'export HBASE_OPTS="${HBASE_OPTS} -Xms1024m -Xmx2048m"' >> /hbase-2.4.9/conf/hbase-env.sh
 
@@ -55,10 +55,12 @@ RUN git clone https://github.com/OpenTSDB/opentsdb.git && \
 COPY hbase-site.xml /hbase-2.4.9/conf
 COPY include.mk /opentsdb/third_party/asyncbigtable/include.mk
 COPY asyncbigtable-0.4.3-jar-with-dependencies.jar.md5 /opentsdb/third_party/asyncbigtable/asyncbigtable-0.4.3-jar-with-dependencies.jar.md5
+COPY opentsdb.conf /opt/opentsdb/opentsdb.conf
 
 RUN apt-get install -y python3 python3-pip
 RUN set -eux; if [ ! -f /usr/bin/python -a ! -L /usr/bin/python ] ; then if [ -L  /usr/bin/python3 -o -f /usr/bin/python3 ] ; then ln -s /usr/bin/python3 /usr/bin/python; else exit "Cannot successfully configure python symbolic link as python3 is not present"; fi ; fi
 
+# RUN mkdir -p /opentsdb/tmp /opentsdb/build/staticroot
 RUN cd /opentsdb && sh build-bigtable.sh install
 
 COPY docker-entrypoint.sh /
